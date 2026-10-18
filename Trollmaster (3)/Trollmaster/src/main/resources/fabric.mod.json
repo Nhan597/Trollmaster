@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "trollmaster107",
+  "version": "1.0.0",
+  "name": "Trollmaster 107",
+  "description": "Mod troll đỉnh cao với 106 cú lừa, mạo danh chat và biến hình!",
+  "authors": ["Creator"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.trollmaster.TrollmasterMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.14.0",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  }
+}
