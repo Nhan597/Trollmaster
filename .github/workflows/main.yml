@@ -16,10 +16,14 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
+        # Thêm thư mục làm việc là thư mục con chứa code
+        working-directory: ./"Trollmaster (3)"
         run: gradle build
 
       - name: Upload Jar Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Trollmaster107-Mod
-          path: build/libs/*.jar
+          path: |
+            "Trollmaster (3)"/build/libs/*.jar
+            build/libs/*.jar
