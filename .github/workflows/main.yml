@@ -15,15 +15,23 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Build with Gradle
-        # Thêm thư mục làm việc là thư mục con chứa code
-        working-directory: ./"Trollmaster (3)"
-        run: gradle build
+        run: |
+          # Tự động tìm thư mục chứa build.gradle để build
+          BUILD_DIR=$(dirname $(find . -name "build.gradle" -not -path "*/.*" | head -n 1))
+          cd "$BUILD_DIR"
+          chmod +x gradlew || true
+          if [ -f "./gradlew" ]; then
+            ./gradlew build
+          else
+            gradle build
+          fi
 
       - name: Upload Jar Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Trollmaster107-Mod
-          path: |
-            "Trollmaster (3)"/build/libs/*.jar
-            build/libs/*.jar
+          name: Minecraft-Mod-Build
+          path: '**/build/libs/*.jar'
