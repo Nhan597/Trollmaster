@@ -15,25 +15,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Gradle
+      - name: Build Project
         run: |
-          # Kiểm tra xem build.gradle nằm ở đâu và chuyển vào đúng thư mục đó
-          if [ -f "build.gradle" ]; then
-            echo "Tìm thấy build.gradle ở thư mục gốc."
-          else
-            # Tìm thư mục con chứa build.gradle đầu tiên
-            SUB_DIR=$(find . -name "build.gradle" -not -path "*/.*" | head -n 1 | xargs dirname)
-            if [ -n "$SUB_DIR" ]; then
-              echo "Chuyển vào thư mục: $SUB_DIR"
-              cd "$SUB_DIR"
-            else
-              echo "Không tìm thấy file build.gradle nào!"
-              exit 1
-            fi
-          }
-
-          # Cấp quyền thực thi cho gradlew nếu có và tiến hành build
-          chmod +x gradlew || true
+          # Tự động tìm vị trí chứa file build.gradle
+          BUILD_FILE=$(find . -name "build.gradle" | head -n 1)
+          if [ -z "$BUILD_FILE" ]; then
+            echo "Không tìm thấy file build.gradle!"
+            exit 1
+          fi
+          
+          # Chuyển vào đúng thư mục chứa project để build
+          DIR=$(dirname "$BUILD_FILE")
+          cd "$DIR"
+          
+          chmod +x gradlew 2>/dev/null || true
           if [ -f "./gradlew" ]; then
             ./gradlew build --no-daemon
           else
