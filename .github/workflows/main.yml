@@ -15,27 +15,28 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Auto-detect and Build Trollmaster
+      - name: Build with Gradle
         run: |
-          # Quét toàn bộ repo để tìm vị trí chứa build.gradle
-          BUILD_FILE=$(find . -name "build.gradle" -not -path "*/.*" | head -n 1)
-          
-          if [ -z "$BUILD_FILE" ]; then
-            echo "Lỗi: Không tìm thấy file build.gradle nào trong toàn bộ repository!"
-            exit 1
-          fi
+          # Kiểm tra xem build.gradle nằm ở đâu và chuyển vào đúng thư mục đó
+          if [ -f "build.gradle" ]; then
+            echo "Tìm thấy build.gradle ở thư mục gốc."
+          else
+            # Tìm thư mục con chứa build.gradle đầu tiên
+            SUB_DIR=$(find . -name "build.gradle" -not -path "*/.*" | head -n 1 | xargs dirname)
+            if [ -n "$SUB_DIR" ]; then
+              echo "Chuyển vào thư mục: $SUB_DIR"
+              cd "$SUB_DIR"
+            else
+              echo "Không tìm thấy file build.gradle nào!"
+              exit 1
+            fi
+          }
 
-          PROJECT_DIR=$(dirname "$BUILD_FILE")
-          echo "Đã tìm thấy build.gradle tại thư mục: $PROJECT_DIR"
-          cd "$PROJECT_DIR"
-
-          # Cấp quyền và ưu tiên chạy gradlew wrapper nếu có
-          chmod +x gradlew 2>/dev/null || true
+          # Cấp quyền thực thi cho gradlew nếu có và tiến hành build
+          chmod +x gradlew || true
           if [ -f "./gradlew" ]; then
-            echo "Đang build bằng wrapper ./gradlew..."
             ./gradlew build --no-daemon
           else
-            echo "Không có gradlew, đang build bằng gradle hệ thống..."
             gradle build
           fi
 
