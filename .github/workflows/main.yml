@@ -15,18 +15,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
       - name: Build with Gradle
         run: |
-          # Tự động tìm thư mục chứa build.gradle để build
-          BUILD_DIR=$(dirname $(find . -name "build.gradle" -not -path "*/.*" | head -n 1))
-          cd "$BUILD_DIR"
-          chmod +x gradlew || true
-          if [ -f "./gradlew" ]; then
+          # Tự động tìm thư mục chứa gradlew và thực hiện build
+          GRADLEW_PATH=$(find . -name "gradlew" -not -path "*/.*" | head -n 1)
+          if [ -n "$GRADLEW_PATH" ]; then
+            DIR=$(dirname "$GRADLEW_PATH")
+            echo "Found gradlew in: $DIR"
+            cd "$DIR"
+            chmod +x gradlew
             ./gradlew build
           else
+            echo "gradlew not found, trying standard gradle"
             gradle build
           fi
 
