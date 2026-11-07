@@ -1,4 +1,4 @@
-name: Build Minecraft Mod
+name: Build Trollmaster Mod
 
 on: [push, pull_request]
 
@@ -15,24 +15,32 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Find and Build Gradle Project
+      - name: Auto-detect and Build Trollmaster
         run: |
-          # Tìm file build.gradle và chuyển vào thư mục đó
-          BUILD_FILE=$(find . -name "build.gradle" | head -n 1)
-          PROJECT_DIR=$(dirname "$BUILD_FILE")
-          echo "Found build.gradle at: $BUILD_FILE"
-          cd "$PROJECT_DIR"
+          # Quét toàn bộ repo để tìm vị trí chứa build.gradle
+          BUILD_FILE=$(find . -name "build.gradle" -not -path "*/.*" | head -n 1)
           
-          # Chạy build
-          chmod +x gradlew || true
+          if [ -z "$BUILD_FILE" ]; then
+            echo "Lỗi: Không tìm thấy file build.gradle nào trong toàn bộ repository!"
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$BUILD_FILE")
+          echo "Đã tìm thấy build.gradle tại thư mục: $PROJECT_DIR"
+          cd "$PROJECT_DIR"
+
+          # Cấp quyền và ưu tiên chạy gradlew wrapper nếu có
+          chmod +x gradlew 2>/dev/null || true
           if [ -f "./gradlew" ]; then
+            echo "Đang build bằng wrapper ./gradlew..."
             ./gradlew build --no-daemon
           else
+            echo "Không có gradlew, đang build bằng gradle hệ thống..."
             gradle build
           fi
 
       - name: Upload Jar Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Simulacrum-Mod-JAR
+          name: Trollmaster-Mod-JAR
           path: '**/build/libs/*.jar'
