@@ -15,18 +15,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Gradle
+      - name: Locate and Build Project
         run: |
-          # Tự động tìm thư mục chứa gradlew và thực hiện build
-          GRADLEW_PATH=$(find . -name "gradlew" -not -path "*/.*" | head -n 1)
-          if [ -n "$GRADLEW_PATH" ]; then
-            DIR=$(dirname "$GRADLEW_PATH")
-            echo "Found gradlew in: $DIR"
-            cd "$DIR"
-            chmod +x gradlew
+          # Tìm thư mục chứa file build.gradle
+          TARGET_DIR=$(dirname $(find . -name "build.gradle" -not -path "*/.*" | head -n 1))
+          echo "Found build.gradle in directory: $TARGET_DIR"
+          cd "$TARGET_DIR"
+          
+          # Cấp quyền và thực thi gradlew
+          chmod +x gradlew || true
+          if [ -f "./gradlew" ]; then
             ./gradlew build
           else
-            echo "gradlew not found, trying standard gradle"
             gradle build
           fi
 
