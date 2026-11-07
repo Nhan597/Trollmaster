@@ -15,17 +15,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Locate and Build Project
+      - name: Find and Build Gradle Project
         run: |
-          # Tìm thư mục chứa file build.gradle
-          TARGET_DIR=$(dirname $(find . -name "build.gradle" -not -path "*/.*" | head -n 1))
-          echo "Found build.gradle in directory: $TARGET_DIR"
-          cd "$TARGET_DIR"
+          # Tìm file build.gradle và chuyển vào thư mục đó
+          BUILD_FILE=$(find . -name "build.gradle" | head -n 1)
+          PROJECT_DIR=$(dirname "$BUILD_FILE")
+          echo "Found build.gradle at: $BUILD_FILE"
+          cd "$PROJECT_DIR"
           
-          # Cấp quyền và thực thi gradlew
+          # Chạy build
           chmod +x gradlew || true
           if [ -f "./gradlew" ]; then
-            ./gradlew build
+            ./gradlew build --no-daemon
           else
             gradle build
           fi
@@ -33,5 +34,5 @@ jobs:
       - name: Upload Jar Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Minecraft-Mod-Build
+          name: Simulacrum-Mod-JAR
           path: '**/build/libs/*.jar'
